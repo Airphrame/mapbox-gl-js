@@ -1,6 +1,59 @@
-## dev
+## 0.12.1 (Dec 8 2015)
 
-An in-progress version being developed in the `master` branch.
+#### Breaking changes
+
+* Reversed the direction of `line-offset` (#1808)
+* Renamed `Pinch` interaction handler to `TouchZoomRotate` (#1777)
+* Made `Map#update` and `Map#render` private methods (#1798)
+* Made `Map#remove` remove created DOM elements (#1789)
+
+#### API Improvements
+
+* Added an method to disable touch rotation (#1777)
+* Added a `position` option for `Attribution` (#1689)
+
+#### Bugfixes
+
+* Ensure tile loading errors are properly reported (#1799)
+* Ensure re-adding a previously removed pop-up works (#1477)
+
+#### UX Improvements
+
+* Don't round zoom level during double-click interaction (#1640)
+
+## 0.12.0 (Dec 2 2015)
+
+#### API Improvements
+
+* Added `line-offset` style property (#1778)
+
+## 0.11.5 (Dec 1 2015)
+
+#### Bugfixes
+
+* Fixed unstable symbol layer render order when adding / removing layers (#1558)
+* Fire map loaded event even if raster tiles have errors
+* Fix panning animation during easeTo with zoom change
+* Fix pitching animation during flyTo
+* Fix pitching animation during easeTo
+* Prevent rotation from firing `mouseend` events (#1104)
+
+#### API Improvements
+
+* Fire `mousedown` and `mouseup` events (#1411)
+* Fire `movestart` and `moveend` when panning (#1658)
+* Added drag events (#1442)
+* Request webp images for mapbox:// raster tiles in chrome (#1725)
+
+#### UX Improvements
+
+* Added inertia to map rotation (#620)
+
+## 0.11.4 (Nov 16 2015)
+
+#### Bugfixes
+
+* Fix alpha blending of alpha layers (#1684)
 
 ## 0.11.3 (Nov 10 2015)
 

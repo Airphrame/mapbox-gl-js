@@ -172,13 +172,9 @@ Style.prototype = util.inherit(Evented, {
     },
 
     _broadcastLayers: function() {
-        var ordered = [];
-
-        for (var id in this._layers) {
-            ordered.push(this._layers[id].json());
-        }
-
-        this.dispatcher.broadcast('set layers', ordered);
+        this.dispatcher.broadcast('set layers', this._order.map(function(id) {
+            return this._layers[id].json();
+        }, this));
     },
 
     _cascade: function(classes, options) {
@@ -388,6 +384,14 @@ Style.prototype = util.inherit(Evented, {
     },
 
     featuresAt: function(coord, params, callback) {
+        this._queryFeatures('featuresAt', coord, params, callback);
+    },
+
+    featuresIn: function(bbox, params, callback) {
+        this._queryFeatures('featuresIn', bbox, params, callback);
+    },
+
+    _queryFeatures: function(queryType, bboxOrCoords, params, callback) {
         var features = [];
         var error = null;
 
@@ -395,38 +399,9 @@ Style.prototype = util.inherit(Evented, {
             params.layerIds = Array.isArray(params.layer) ? params.layer : [params.layer];
         }
 
-        util.asyncEach(Object.keys(this.sources), function(id, callback) {
+        util.asyncAll(Object.keys(this.sources), function(id, callback) {
             var source = this.sources[id];
-            source.featuresAt(coord, params, function(err, result) {
-                if (result) features = features.concat(result);
-                if (err) error = err;
-                callback();
-            });
-        }.bind(this), function() {
-            if (error) return callback(error);
-
-            callback(null, features
-                .filter(function(feature) {
-                    return this._layers[feature.layer] !== undefined;
-                }.bind(this))
-                .map(function(feature) {
-                    feature.layer = this._layers[feature.layer].json();
-                    return feature;
-                }.bind(this)));
-        }.bind(this));
-    },
-
-    featuresIn: function(bbox, params, callback) {
-        var features = [];
-        var error = null;
-
-        if (params.layer) {
-            params.layer = { id: params.layer };
-        }
-
-        util.asyncEach(Object.keys(this.sources), function(id, callback) {
-            var source = this.sources[id];
-            source.featuresIn(bbox, params, function(err, result) {
+            source[queryType](bboxOrCoords, params, function(err, result) {
                 if (result) features = features.concat(result);
                 if (err) error = err;
                 callback();

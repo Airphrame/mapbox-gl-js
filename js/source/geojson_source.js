@@ -114,7 +114,7 @@ GeoJSONSource.prototype = util.inherit(Evented, /** @lends GeoJSONSource.prototy
     _updateData: function() {
         this._dirty = false;
         var data = this._data;
-        if (typeof data === 'string') {
+        if (typeof data === 'string' && typeof window != 'undefined') {
             data = urlResolve(window.location.href, data);
         }
         this.workerID = this.dispatcher.send('parse geojson', {
@@ -123,15 +123,14 @@ GeoJSONSource.prototype = util.inherit(Evented, /** @lends GeoJSONSource.prototy
             source: this.id,
             geojsonVtOptions: this.geojsonVtOptions
         }, function(err) {
-
+            this._loaded = true;
             if (err) {
                 this.fire('error', {error: err});
-                return;
+            } else {
+                this._pyramid.reload();
+                this.fire('change');
             }
-            this._loaded = true;
-            this._pyramid.reload();
 
-            this.fire('change');
         }.bind(this));
     },
 

@@ -3,23 +3,31 @@
 var DOM = require('../../util/dom'),
     util = require('../../util/util');
 
-module.exports = Pinch;
+module.exports = TouchZoomRotate;
 
 
-function Pinch(map) {
+function TouchZoomRotate(map) {
     this._map = map;
     this._el = map.getCanvasContainer();
 
     util.bindHandlers(this);
 }
 
-Pinch.prototype = {
+TouchZoomRotate.prototype = {
     enable: function () {
         this._el.addEventListener('touchstart', this._onStart, false);
     },
 
     disable: function () {
         this._el.removeEventListener('touchstart', this._onStart);
+    },
+
+    disableRotation: function() {
+        this._rotationDisabled = true;
+    },
+
+    enableRotation: function() {
+        this._rotationDisabled = false;
     },
 
     _onStart: function (e) {
@@ -44,7 +52,7 @@ Pinch.prototype = {
             p = p0.add(p1).div(2),
             vec = p0.sub(p1),
             scale = vec.mag() / this._startVec.mag(),
-            bearing = vec.angleWith(this._startVec) * 180 / Math.PI,
+            bearing = this._rotationDisabled ? 0 : vec.angleWith(this._startVec) * 180 / Math.PI,
             map = this._map;
 
         map.easeTo({
